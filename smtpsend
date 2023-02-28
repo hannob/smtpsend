@@ -1,0 +1,66 @@
+#!/usr/bin/python3
+
+import sys
+import argparse
+import smtplib
+import ssl
+import email
+
+TESTMSG = """Subject: Hello World
+
+Hello World,
+
+how are you today?
+"""
+
+ap = argparse.ArgumentParser()
+ap.add_argument("to", nargs=1, help="To mail address")
+ap.add_argument("-f", "--from", help="From mail address")
+ap.add_argument("-s", "--server", help="Hostname")
+ap.add_argument("-u", "--user", help="Login username")
+ap.add_argument("-p", "--password", help="Login password")
+ap.add_argument("--port")
+ap.add_argument("-v", "--verbose", help="Print message before sending")
+ap.add_argument("--noauth", action="store_true", help="Do not try to authenticate")
+ap.add_argument("--notls", action="store_true")
+ap.add_argument("--dummy", action="store_true", help="Use dummy message for testing")
+
+args = ap.parse_args()
+
+ffrom = getattr(args, "from")
+fdomain = ffrom.split("@")[1]
+
+if args.dummy:
+    imsg = TESTMSG
+else:
+    imsg = sys.stdin.read()
+
+if args.port:
+    port = args.port
+else:
+    port = 0
+
+msg = email.message_from_string(imsg)
+
+if "Date" not in msg:
+    # "No date header, setting one"
+    msg["Date"] = email.utils.formatdate()
+if "Message-Id" not in msg:
+    # no message-id, generating a random one
+    msg["Message-Id"] = email.utils.make_msgid(domain=fdomain)
+if "From" not in msg:
+    msg["From"] = ffrom
+if "To" not in msg:
+    msg["To"] = args.to
+
+if args.verbose:
+    print(msg)
+
+if not args.notls:
+    con = smtplib.SMTP_SSL(host=args.server, context=ssl.create_default_context())
+else:
+    con = smtplib.SMTP(host=args.server, port=port)
+if not args.noauth:
+    con.login(args.user, args.password)
+con.send_message(msg, ffrom, args.to)
+con.quit()
