@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
-import sys
 import argparse
+import email
 import smtplib
 import ssl
-import email
+import sys
 
 TESTMSG = """Subject: Hello World
 
