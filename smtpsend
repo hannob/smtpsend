@@ -17,7 +17,7 @@ how are you today?
 ap = argparse.ArgumentParser()
 ap.add_argument("to", nargs=1, help="To mail address")
 ap.add_argument("-f", "--from", help="From mail address")
-ap.add_argument("-s", "--server", help="Hostname")
+ap.add_argument("-s", "--server", help="Hostname", required=True)
 ap.add_argument("-u", "--user", help="Login username")
 ap.add_argument("-p", "--password", help="Login password")
 ap.add_argument("--port")
