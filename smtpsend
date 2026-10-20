@@ -6,6 +6,7 @@ import email
 import smtplib
 import ssl
 import sys
+from email.policy import EmailPolicy
 
 TESTMSG = """Subject: Hello World
 
@@ -41,7 +42,7 @@ if args.port:
 else:
     port = 0
 
-msg = email.message_from_string(imsg)
+msg = email.message_from_string(imsg, policy=EmailPolicy(refold_source="none"))
 
 if "Date" not in msg:
     # "No date header, setting one"
